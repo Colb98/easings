@@ -48,4 +48,19 @@ The browser checks cover interactive flows and desktop/mobile rendering. Generat
 - `server.mjs`: local HTTP server and LAN QR-code endpoint.
 - `tests/`: mathematical checks and browser verification.
 
-No frontend build step is required.
+No build step is required for local development.
+
+## Deploy to Vercel
+
+The committed `vercel.json` selects the Other preset, runs `npm run build`, and publishes `dist/` as a static site. Import the repository with the repository root as Root Directory. Remove any old custom server/function routing overrides before redeploying.
+
+```sh
+npm ci
+npm run build
+```
+
+The build bundles browser code and QR generation; it does not deploy `server.mjs` or invoke `app.js` as a Node.js function. Hosted sharing creates a QR code for the page's public origin, including custom domains. Local `npm start` continues to use LAN sharing.
+
+If an earlier deployment reports `matchMedia is not defined`, redeploy the commit containing `vercel.json`: browser code was being invoked as a server function.
+
+Run `npm run test:hosted` to verify the built static page and hosted QR sharing without a backend.

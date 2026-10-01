@@ -19,3 +19,7 @@ coverage/
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Static deployment output and local Vercel settings
+dist/
+.vercel/

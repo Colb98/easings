@@ -1,3 +1,4 @@
+import {hosted, getShareLinks} from './sharing.js';
 import {definitions,defaults,evaluate} from './easings.js';
 const $=s=>document.querySelector(s);
 const selected=new Set(definitions.map(d=>d.id));
@@ -52,11 +53,16 @@ $('#all').onclick=all;$('#restore').onclick=all;$('#none').onclick=()=>{selected
 document.addEventListener('click',e=>{if(!e.target.closest('.filter-wrap'))toggleFilter(false);});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){toggleFilter(false);}});
 $('#reset').onclick=()=>{definitions.forEach(d=>parameters[d.id]=defaults(d.family));render();};
+if(hosted){
+ $('#share span').textContent='Share page';
+ $('#share-dialog > p').textContent='Scan the code to open this page on another device.';
+ $('.share-note').textContent='Anyone with this link can open the page. Each device has its own comparison session.';
+}
 $('#share').onclick=async()=>{
  $('#share-dialog').showModal();
- try{const response=await fetch('/api/share');if(!response.ok)throw new Error();const {links}=await response.json();const box=$('#share-content');box.innerHTML='';
+ try{const links=await getShareLinks();const box=$('#share-content');box.innerHTML='';
  if(!links.length){box.textContent='No local network address found. Connect this computer to Wi-Fi and try again.';return;}
- const image=document.createElement('img');image.alt='QR code to open Easing Lab on your local network';const link=document.createElement('a');const select=document.createElement('select');select.setAttribute('aria-label','Local network address');
+ const image=document.createElement('img');image.alt='QR code to open Easing Lab';const link=document.createElement('a');const select=document.createElement('select');select.setAttribute('aria-label','Local network address');
  links.forEach((item,i)=>{const option=document.createElement('option');option.value=i;option.textContent=`${item.name} · ${item.address}`;select.append(option);});
  function choose(i){image.src=links[i].qr;link.href=links[i].url;link.textContent=links[i].url;}
  select.onchange=()=>choose(Number(select.value));if(links.length>1)box.append(select);box.append(image,link);choose(0);

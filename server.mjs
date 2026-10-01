@@ -3,7 +3,7 @@ import { networkInterfaces } from 'node:os';
 import { readFile } from 'node:fs/promises';
 import QRCode from 'qrcode';
 const port = Number(process.env.PORT || 5173);
-const files = new Map([['/', ['index.html','text/html']], ['/app.js',['app.js','text/javascript']], ['/easings.js',['easings.js','text/javascript']], ['/style.css',['style.css','text/css']]]);
+const files = new Map([['/', ['index.html','text/html']], ['/app.js',['app.js','text/javascript']], ['/sharing.js',['sharing.js','text/javascript']], ['/favicon.svg',['favicon.svg','image/svg+xml']], ['/easings.js',['easings.js','text/javascript']], ['/style.css',['style.css','text/css']]]);
 http.createServer(async (req,res) => {
  try {
   const path = new URL(req.url,'http://localhost').pathname;
