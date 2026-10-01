@@ -1,0 +1,16 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch();const page=await browser.newPage({viewport:{width:1440,height:1100}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto('http://localhost:5173');await page.waitForTimeout(600);
+assert.equal(await page.locator('.cell').count(),31);
+await page.getByRole('button',{name:'Ⅱ Pause',exact:true}).click();
+await page.locator('#progress').fill('0.5');
+const linear=page.locator('[data-easing="linear"]');assert.equal(await linear.locator('.ball').evaluate(e=>e.style.left),'50%');
+await page.locator('#duration').fill('3');assert.equal(await page.locator('#total').textContent(),'3.00 s');
+await page.locator('#filter').click();await page.getByRole('button',{name:'Clear',exact:true}).click();assert.equal(await page.locator('.cell').count(),0);
+await page.getByLabel('easeInQuad',{exact:true}).check();await page.getByLabel('easeOutElastic',{exact:true}).check();assert.equal(await page.locator('.cell').count(),2);
+await page.locator('#filter').click();const before=await page.locator('[data-easing="easeInQuad"] .curve').getAttribute('d');await page.getByLabel('easeInQuad exponent').fill('4');assert.notEqual(await page.locator('[data-easing="easeInQuad"] .curve').getAttribute('d'),before);
+await page.locator('#size').selectOption('large');await page.locator('#share').click();await page.locator('#share-content img').waitFor();assert.match(await page.locator('#share-content a').getAttribute('href'),/^http:\/\/192\.168\./);assert.ok(await page.locator('#share-content img').evaluate(e=>e.complete&&e.naturalWidth>0));await page.locator('#close-share').click();
+await page.locator('#filter').click();await page.getByRole('button',{name:'Select all',exact:true}).click();await page.locator('#filter').click();await page.locator('#reset').click();await page.locator('#size').selectOption('comfortable');await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:'desktop-preview.png',fullPage:false});
+await page.setViewportSize({width:390,height:844});await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:'mobile-preview.png',fullPage:false});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);
+await browser.close();console.log('PASS: rendering, sync, duration, filtering, editing, grid size, QR image, mobile overflow, and console errors.');

@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Generated previews and test output
+*-preview.png
+playwright-report/
+test-results/
+coverage/
+
+# Operating system files
+.DS_Store
+Thumbs.db

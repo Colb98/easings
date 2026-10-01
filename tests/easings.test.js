@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {definitions,defaults,evaluate} from '../easings.js';
+test('31 curves have exact endpoints and finite values',()=>{assert.equal(definitions.length,31);for(const d of definitions){assert.equal(evaluate(d,0),0);assert.equal(evaluate(d,1),1);for(let i=0;i<=1000;i++)assert.ok(Number.isFinite(evaluate(d,i/1000)),d.id);}});
+test('directional curves mirror and in-out is symmetric',()=>{for(const d of definitions.filter(d=>d.mode==='In')){const out=definitions.find(o=>o.family===d.family&&o.mode==='Out');const io=definitions.find(o=>o.family===d.family&&o.mode==='InOut');for(let i=1;i<100;i++){const t=i/100;assert.ok(Math.abs(evaluate(d,t)+evaluate(out,1-t)-1)<1e-10);assert.ok(Math.abs(evaluate(io,t)+evaluate(io,1-t)-1)<1e-10);}}});
+test('default bounce matches conventional bounce reference',()=>{const d=definitions.find(d=>d.id==='easeOutBounce');const reference=t=>t<1/2.75?7.5625*t*t:t<2/2.75?7.5625*(t-1.5/2.75)**2+.75:t<2.5/2.75?7.5625*(t-2.25/2.75)**2+.9375:7.5625*(t-2.625/2.75)**2+.984375;for(let i=0;i<=100;i++)assert.ok(Math.abs(evaluate(d,i/100)-reference(i/100))<1e-10);});
+test('parameter changes affect the curve',()=>{for(const d of definitions){const p=defaults(d.family);for(const key of Object.keys(p)){const modified={...p,[key]:p[key]+(key==='bounces'?1:.1)};assert.ok(Array.from({length:20},(_,i)=>i/20).some(t=>Math.abs(evaluate(d,t,p)-evaluate(d,t,modified))>1e-5),`${d.id} ${key}`);}}});
